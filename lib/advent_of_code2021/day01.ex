@@ -5,6 +5,8 @@ defmodule AdventOfCode2021.Day01 do
   @type total :: integer
   @type index :: integer
 
+  alias AdventOfCode2021.InputReader
+
   def handle_pt1 do
     read_input()
     |> parse_pt1()
@@ -60,10 +62,7 @@ defmodule AdventOfCode2021.Day01 do
   end
 
   defp read_input do
-    input = File.read!(Path.join([File.cwd!(), "static", "day01_input.txt"]))
-
-    input
-    |> to_string()
+    InputReader.read("day01_input.txt")
     |> String.split("\n")
     |> Enum.map(&String.to_integer/1)
   end
