@@ -47,36 +47,26 @@ defmodule AdventOfCode2021.Day03 do
         InputReader.read("day03_input.txt")
         |> String.split("\n")
 
-      oxygen_generator_rating = get_most_frequent(input, 0)
-      co2_scrubber_rating = get_least_frequent(input, 0)
+      oxygen_generator_rating = iterate(input, fn char, most_freq -> char == most_freq end)
+      co2_scrubber_rating = iterate(input, fn char, most_freq -> char != most_freq end)
 
       oxygen_generator_rating * co2_scrubber_rating
     end
 
-    def get_most_frequent([final], _index) do
+    def iterate(list, cb), do: iterate(list, cb, 0)
+
+    def iterate([final], _cb, _index) do
       {num, _} = Integer.parse(final, 2)
       num
     end
 
-    def get_most_frequent(list, index) do
+    def iterate(list, comparator, index) do
       most_frequent = count_frequency(list, index, {0, 0})
 
-      remaining = Enum.filter(list, fn str -> String.at(str, index) == most_frequent end)
+      remaining =
+        Enum.filter(list, fn str -> comparator.(String.at(str, index), most_frequent) end)
 
-      get_most_frequent(remaining, index + 1)
-    end
-
-    def get_least_frequent([final], _index) do
-      {num, _} = Integer.parse(final, 2)
-      num
-    end
-
-    def get_least_frequent(list, index) do
-      most_frequent = count_frequency(list, index, {0, 0})
-
-      remaining = Enum.filter(list, fn str -> String.at(str, index) != most_frequent end)
-
-      get_least_frequent(remaining, index + 1)
+      iterate(remaining, comparator, index + 1)
     end
 
     def count_frequency([head | tail], index, {zeros, ones}) do
