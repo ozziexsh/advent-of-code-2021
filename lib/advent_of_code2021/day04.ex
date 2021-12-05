@@ -1,8 +1,8 @@
 defmodule AdventOfCode2021.Day04 do
   alias AdventOfCode2021.InputReader
 
-  defmodule Part01 do
-    def handle do
+  defmodule Common do
+    def parse_input() do
       input =
         InputReader.read("day04_input.txt")
         |> String.split("\n")
@@ -26,28 +26,8 @@ defmodule AdventOfCode2021.Day04 do
 
       called_numbers = number_string |> String.split(",") |> Enum.map(&String.to_integer/1)
 
-      iterate(called_numbers, boards)
+      {called_numbers, boards}
     end
-
-    # draw number
-    # loop through boards
-    #   mark board if has number
-    #   check if board has vert / horiz line
-    #     yes -> return board
-    #     no -> next board
-    def iterate([drawn_number | tail], boards) do
-      updated_boards = mark_boards(boards, drawn_number)
-
-      winner = Enum.find(updated_boards, fn board -> has_row?(board) || has_col?(board) end)
-
-      if winner do
-        sum_unmarked_cells(winner) * drawn_number
-      else
-        iterate(tail, updated_boards)
-      end
-    end
-
-    def iterate([], _boards), do: nil
 
     def sum_unmarked_cells(list), do: sum_unmarked_cells(list, 0)
 
@@ -88,5 +68,62 @@ defmodule AdventOfCode2021.Day04 do
     def has_col?(board, index) do
       Enum.all?(board, fn row -> Enum.at(row, index).called? end) || has_col?(board, index + 1)
     end
+  end
+
+  defmodule Part01 do
+    import AdventOfCode2021.Day04.Common
+
+    def handle do
+      {called_numbers, boards} = parse_input()
+
+      iterate(called_numbers, boards)
+    end
+
+    # draw number
+    # loop through boards
+    #   mark board if has number
+    #   check if board has vert / horiz line
+    #     yes -> return board
+    #     no -> next board
+    def iterate([drawn_number | tail], boards) do
+      updated_boards = mark_boards(boards, drawn_number)
+
+      winner = Enum.find(updated_boards, fn board -> has_row?(board) || has_col?(board) end)
+
+      if winner do
+        sum_unmarked_cells(winner) * drawn_number
+      else
+        iterate(tail, updated_boards)
+      end
+    end
+
+    def iterate([], _boards), do: nil
+  end
+
+  defmodule Part02 do
+    import AdventOfCode2021.Day04.Common
+
+    def handle do
+      {called_numbers, boards} = parse_input()
+
+      iterate(called_numbers, boards)
+    end
+
+    def iterate([drawn_number | tail], boards) do
+      updated_boards = mark_boards(boards, drawn_number)
+
+      open_boards =
+        Enum.reject(updated_boards, fn board ->
+          has_row?(board) || has_col?(board)
+        end)
+
+      if Enum.count(open_boards) == 0 do
+        sum_unmarked_cells(List.last(updated_boards)) * drawn_number
+      else
+        iterate(tail, open_boards)
+      end
+    end
+
+    def iterate([], _boards), do: nil
   end
 end
