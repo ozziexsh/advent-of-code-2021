@@ -85,17 +85,20 @@ defmodule AdventOfCode2021.Day05 do
 
     def iterate([], lookup), do: lookup
 
-    def draw_diagonal([{x1, y1}, {x2, y2}], lookup) when x1 == x2 and y1 == y2,
-      do: place_coord(lookup, x1, y1)
+    def draw_diagonal([{from_x, from_y}, {to_x, to_y}], lookup)
+        when from_x == to_x and from_y == to_y,
+        do: place_coord(lookup, from_x, from_y)
 
-    def draw_diagonal([{x1, y1}, {_x2, _y2}] = coords, lookup) do
-      draw_diagonal(move_toward_point(coords), place_coord(lookup, x1, y1))
+    def draw_diagonal([{from_x, from_y}, {_to_x, _to_y}] = coords, lookup) do
+      coords
+      |> move_toward_point()
+      |> draw_diagonal(place_coord(lookup, from_x, from_y))
     end
 
-    def move_toward_point([{x1, y1}, {x2, y2}]) do
-      new_x = if x1 > x2, do: x1 - 1, else: x1 + 1
-      new_y = if y1 > y2, do: y1 - 1, else: y1 + 1
-      [{new_x, new_y}, {x2, y2}]
+    def move_toward_point([{from_x, from_y}, {to_x, to_y}]) do
+      new_x = if from_x > to_x, do: from_x - 1, else: from_x + 1
+      new_y = if from_y > to_y, do: from_y - 1, else: from_y + 1
+      [{new_x, new_y}, {to_x, to_y}]
     end
   end
 end
