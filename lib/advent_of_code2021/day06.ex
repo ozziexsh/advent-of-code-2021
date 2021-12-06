@@ -46,13 +46,10 @@ defmodule AdventOfCode2021.Day06 do
 
     def iterate([day_0 | tail], days_remaining) do
       # create N new fish from fish on day 0
-      new_list = tail ++ [day_0]
-
+      (tail ++ [day_0])
       # add day 0 fish to day 6
-      day_6 = Enum.at(new_list, 6)
-      new_list = List.replace_at(new_list, 6, day_6 + day_0)
-
-      iterate(new_list, days_remaining - 1)
+      |> List.update_at(6, fn day_6 -> day_6 + day_0 end)
+      |> iterate(days_remaining - 1)
     end
   end
 end
